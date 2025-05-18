@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { countryList } from '@/app/utils/countryList';
 import { Textarea } from '@/components/ui/textarea';
 import { UploadDropzone } from '@/app/utils/uploadthing';
-import { createCompany, deleteLogoFile } from '@/app/actions';
+import { createCompany, deleteFile } from '@/app/actions';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { XIcon } from 'lucide-react';
@@ -64,14 +64,14 @@ const CompanyForm = () => {
   const handleDelete = async () => {
     if (!key) return;
     try {
-      const res = await deleteLogoFile(key);
+      const res = await deleteFile(key);
       if (res.success) {
         setkey('');
       } else {
         console.error('Delete failed:', res);
       }
     } catch (err) {
-      console.error('Error calling deleteLogoFile:', err);
+      console.error('Error calling deleteFile:', err);
     }
   };
   return (

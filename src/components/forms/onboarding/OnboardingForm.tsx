@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 import UserTypeSelection from './UserTypeForm';
 import { CompanyForm } from './CompanyForm';
+import JobSeekerForm from './JobSeekerForm';
 type UserType = 'company' | 'jobSeeker' | null;
 
 export const OnboardingForm = () => {
@@ -24,11 +25,7 @@ export const OnboardingForm = () => {
         break;
 
       case 2:
-        return userType === 'company' ? (
-          <CompanyForm />
-        ) : (
-          <p>User is a job seeker</p>
-        );
+        return userType === 'company' ? <CompanyForm /> : <JobSeekerForm />;
         break;
 
       default:

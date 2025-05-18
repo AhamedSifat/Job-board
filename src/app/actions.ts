@@ -2,7 +2,7 @@
 import { prisma } from '@/lib/prisma';
 import { requireUser } from './utils/requireUser';
 import { z } from 'zod';
-import { companySchema } from './utils/zodSchemas';
+import { companySchema, jobSeekerSchema } from './utils/zodSchemas';
 import { redirect } from 'next/navigation';
 import { UTApi } from 'uploadthing/server';
 
@@ -31,7 +31,7 @@ export const createCompany = async (data: z.infer<typeof companySchema>) => {
 
 const utapi = new UTApi();
 
-export async function deleteLogoFile(key: string) {
+export async function deleteFile(key: string) {
   // perform the delete
   const raw = await utapi.deleteFiles(key);
 
@@ -46,4 +46,26 @@ export async function deleteLogoFile(key: string) {
         }))
       : undefined,
   };
+}
+export async function createJobSeeker(data: z.infer<typeof jobSeekerSchema>) {
+  const user = await requireUser();
+
+  const validatedData = jobSeekerSchema.parse(data);
+
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      onboardingCompleted: true,
+      userType: 'JOB_SEEKER',
+      JobSeeker: {
+        create: {
+          ...validatedData,
+        },
+      },
+    },
+  });
+
+  return redirect('/');
 }
