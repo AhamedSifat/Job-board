@@ -5,6 +5,7 @@ import Logo from '../../../../public/logo.png';
 import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 import UserTypeSelection from './UserTypeForm';
+import { CompanyForm } from './CompanyForm';
 type UserType = 'company' | 'jobSeeker' | null;
 
 export const OnboardingForm = () => {
@@ -24,7 +25,7 @@ export const OnboardingForm = () => {
 
       case 2:
         return userType === 'company' ? (
-          <p>User is an company</p>
+          <CompanyForm />
         ) : (
           <p>User is a job seeker</p>
         );

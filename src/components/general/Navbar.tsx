@@ -7,6 +7,7 @@ import { auth, signOut } from '@/app/utils/auth';
 
 export const Navbar = async () => {
   const session = await auth();
+  // console.log(session);
 
   return (
     <nav className='flex justify-between items-center py-5'>

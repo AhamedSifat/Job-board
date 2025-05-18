@@ -124,8 +124,33 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
+  onboardingCompleted: 'onboardingCompleted',
+  userType: 'userType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   emailVerified: 'emailVerified',
-  image: 'image',
+  image: 'image'
+};
+
+exports.Prisma.CompanyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  location: 'location',
+  about: 'about',
+  logo: 'logo',
+  website: 'website',
+  xAccount: 'xAccount',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobSeekerScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  about: 'about',
+  resume: 'resume',
+  userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -174,10 +199,15 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.UserType = exports.$Enums.UserType = {
+  COMPANY: 'COMPANY',
+  JOB_SEEKER: 'JOB_SEEKER'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Company: 'Company',
+  JobSeeker: 'JobSeeker',
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken'
