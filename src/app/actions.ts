@@ -5,9 +5,38 @@ import { z } from 'zod';
 import { companySchema, jobSeekerSchema } from './utils/zodSchemas';
 import { redirect } from 'next/navigation';
 import { UTApi } from 'uploadthing/server';
+import arcjet, { detectBot, shield } from './utils/arcjet';
+import { request } from '@arcjet/next';
+
+const aj = arcjet
+  .withRule(
+    shield({
+      mode: 'LIVE',
+    })
+  )
+  .withRule(
+    detectBot({
+      mode: 'LIVE',
+      allow: [
+        'CATEGORY:SEARCH_ENGINE', // Google, Bing, etc
+        // Uncomment to allow these other common bot categories
+        // See the full list at https://arcjet.com/bot-list
+        //"CATEGORY:MONITOR", // Uptime monitoring services
+        //"CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
+      ],
+    })
+  );
 
 export const createCompany = async (data: z.infer<typeof companySchema>) => {
   const session = await requireUser();
+
+  const req = await request();
+
+  const decision = await aj.protect(req);
+
+  if (decision.isDenied()) {
+    throw new Error('Forbidden');
+  }
 
   const validateData = companySchema.parse(data);
 
@@ -51,7 +80,13 @@ export async function createJobSeeker(data: z.infer<typeof jobSeekerSchema>) {
   const user = await requireUser();
 
   const validatedData = jobSeekerSchema.parse(data);
+  const req = await request();
 
+  const decision = await aj.protect(req);
+
+  if (decision.isDenied()) {
+    throw new Error('Forbidden');
+  }
   await prisma.user.update({
     where: {
       id: user.id,
