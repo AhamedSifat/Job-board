@@ -29,6 +29,7 @@ model User {
   userType      UserType?
   Company       Company? 
   JobSeeker     JobSeeker?
+  stripeCustomerId String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation';
 import { UTApi } from 'uploadthing/server';
 import arcjet, { detectBot, shield } from './utils/arcjet';
 import { request } from '@arcjet/next';
+import { stripe } from './utils/stripe';
+import { jobListingDurationPricing } from './utils/pricingTiers';
 
 const aj = arcjet
   .withRule(
@@ -76,6 +78,7 @@ export async function deleteFile(key: string) {
       : undefined,
   };
 }
+
 export async function createJobSeeker(data: z.infer<typeof jobSeekerSchema>) {
   const user = await requireUser();
 
@@ -124,6 +127,11 @@ export async function createJob(data: z.infer<typeof jobSchema>) {
     },
     select: {
       id: true,
+      user: {
+        select: {
+          stripeCustomerId: true,
+        },
+      },
     },
   });
 
@@ -131,7 +139,27 @@ export async function createJob(data: z.infer<typeof jobSchema>) {
     return redirect('/');
   }
 
-  await prisma.jobPost.create({
+  let stripeCustomerId = company.user.stripeCustomerId;
+  if (!stripeCustomerId) {
+    const stripeCustomer = await stripe.customers.create({
+      email: user.email as string,
+      name: user.name as string,
+    });
+
+    stripeCustomerId = stripeCustomer.id;
+
+    //udpate user with stripe customer id
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        stripeCustomerId: stripeCustomerId,
+      },
+    });
+  }
+
+  const jobPost = await prisma.jobPost.create({
     data: {
       jobDescription: validatedData.jobDescription,
       jobTitle: validatedData.jobTitle,
@@ -144,4 +172,42 @@ export async function createJob(data: z.infer<typeof jobSchema>) {
       companyId: company.id,
     },
   });
+
+  const priceTier = jobListingDurationPricing.find(
+    (tier) => tier.days === validatedData.listingDuration
+  );
+
+  if (!priceTier) {
+    throw new Error('Invalid listing duration');
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    customer: stripeCustomerId,
+    payment_method_types: ['card'],
+    mode: 'payment',
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Job Posting - ${priceTier.days} days`,
+            description: priceTier.description,
+            images: [
+              'https://sihaa05d3g.ufs.sh/f/7HPNobXHgM2tqju0NPDvrZVtf4k6FTL2JE7hadBAuOI8oGjH',
+            ],
+          },
+
+          unit_amount: priceTier.price * 100, // Convert to cents
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      jobPost: jobPost.id,
+    },
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/paymen/cancel`,
+  });
+
+  return redirect(session.url as string);
 }
