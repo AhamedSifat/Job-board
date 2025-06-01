@@ -2,6 +2,7 @@ import { stripe } from '@/app/utils/stripe';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
+import { inngest } from '@/app/utils/inngest/client';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -62,6 +63,15 @@ export async function POST(req: Request) {
       },
       data: {
         status: 'ACTIVE',
+      },
+    });
+
+    // now the job is live, schedule its expiration
+    await inngest.send({
+      name: 'job/created',
+      data: {
+        jobId: jobId,
+        expirationDays: Number(session.metadata?.listingDuration), // or pull from your own DB
       },
     });
   }
