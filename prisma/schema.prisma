@@ -38,7 +38,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
- 
+   SavedJobPost SavedJobPost[]
 }
 
 model Company {
@@ -130,6 +130,7 @@ model JobPost {
 
   Company Company? @relation(fields: [companyId], references: [id])
   companyId String?
+    SavedJobPost SavedJobPost[]
 }
 
  
@@ -137,4 +138,19 @@ enum JobPostStatus {
   DRAFT
   ACTIVE
   EXPIRED
+}
+
+
+model SavedJobPost {
+  id     String @id @default(uuid())
+  jobId  String
+  userId String
+
+  job  JobPost @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, jobId])
 }
