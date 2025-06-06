@@ -1,46 +1,63 @@
 import { prisma } from '@/lib/prisma';
 import { EmptyState } from './EmptyState';
 import { JobCard } from './JobCard';
+import { MainPagination } from './Pagination';
 
-const getData = async () => {
-  const data = await prisma.jobPost.findMany({
-    where: {
-      status: 'ACTIVE',
-    },
-    select: {
-      jobTitle: true,
-      id: true,
-      salaryFrom: true,
-      salaryTo: true,
-      employmentType: true,
-      location: true,
-      createdAt: true,
+const getData = async (page: number = 1, pageSize: number = 2) => {
+  const skip = (page - 1) * pageSize;
 
-      Company: {
-        select: {
-          name: true,
-          logo: true,
-          location: true,
-          about: true,
+  const [data, totalCount] = await Promise.all([
+    prisma.jobPost.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      take: pageSize,
+      skip: skip,
+
+      select: {
+        jobTitle: true,
+        id: true,
+        salaryFrom: true,
+        salaryTo: true,
+        employmentType: true,
+        location: true,
+        createdAt: true,
+
+        Company: {
+          select: {
+            name: true,
+            logo: true,
+            location: true,
+            about: true,
+          },
         },
       },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
 
-  return data;
+    prisma.jobPost.count({
+      where: {
+        status: 'ACTIVE',
+      },
+    }),
+  ]);
+
+  return {
+    jobs: data,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
-const JobListings = async () => {
-  const data = await getData();
+const JobListings = async ({ currentPage }: { currentPage: number }) => {
+  const { jobs, totalPages } = await getData();
 
   return (
     <>
-      {data.length > 0 ? (
+      {jobs.length > 0 ? (
         <div className='flex flex-col gap-6'>
-          {data.map((job, index) => (
+          {jobs.map((job, index) => (
             <JobCard
               job={{
                 ...job,
@@ -63,6 +80,10 @@ const JobListings = async () => {
           href='/'
         />
       )}
+
+      <div className='flex justify-center mt-6'>
+        <MainPagination totalPages={totalPages} currentPage={currentPage} />
+      </div>
     </>
   );
 };
