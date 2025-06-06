@@ -1,10 +1,11 @@
+import { requireUser } from '@/app/utils/requireUser';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { XIcon } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
-const CancelledPage = () => {
+const CancelledPage = async () => {
+  await requireUser();
   return (
     <div className='w-full h-screen flex flex-1 justify-center items-center'>
       <Card className='w-[350px]'>

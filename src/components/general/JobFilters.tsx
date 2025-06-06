@@ -17,16 +17,66 @@ import { Checkbox } from '../ui/checkbox';
 import { countryList } from '@/app/utils/countryList';
 import { Separator } from '../ui/separator';
 import { Input } from '@/components/ui/input';
-
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
+const jobTypes = ['full-time', 'part-time', 'contract', 'internship'];
 export function JobFilters() {
-  const jobTypes = ['full-time', 'part-time', 'contract', 'internship'];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  //get current filters from the URL or state
+  const currentJobType = searchParams.get('jobType')?.split(',') || [];
+  const currentLocation = searchParams.get('location') || '';
+
+  // Logic to clear all filters
+  const clearAllFilters = () => {
+    router.push('/');
+  };
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (value) {
+        params.set(name, value);
+      } else {
+        params.delete(name);
+      }
+
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  // Logic to handle job type checkbox changes
+  const handleJobTypeChange = (type: string, checked: boolean) => {
+    const currentTypes = new Set(currentJobType);
+    if (checked) {
+      currentTypes.add(type);
+    } else {
+      currentTypes.delete(type);
+    }
+
+    const newJobType = Array.from(currentTypes).join(',');
+    const queryString = createQueryString('jobType', newJobType);
+    router.push(`?${queryString}`);
+  };
+
+  const handleLocationChange = (location: string) => {
+    router.push(`?${createQueryString('location', location)}`);
+  };
 
   return (
     <Card className='col-span-1 h-fit'>
       <CardHeader className='space-y-4'>
         <div className='flex justify-between items-center'>
           <CardTitle className='text-2xl font-semibold'>Filter</CardTitle>
-          <Button variant='destructive' size='sm' className='h-8'>
+          <Button
+            onClick={clearAllFilters}
+            variant='destructive'
+            size='sm'
+            className='h-8'
+          >
             <span className='mr-2'>Clear all</span>
             <X className='h-4 w-4' />
           </Button>
@@ -39,7 +89,13 @@ export function JobFilters() {
           <div className='grid grid-cols-2 gap-4'>
             {jobTypes.map((type) => (
               <div key={type} className='flex items-center space-x-2'>
-                <Checkbox id={type.toLowerCase()} />
+                <Checkbox
+                  id={type.toLowerCase()}
+                  checked={currentJobType.includes(type)}
+                  onCheckedChange={(checked) => {
+                    handleJobTypeChange(type, checked as boolean);
+                  }}
+                />
                 <Label
                   htmlFor={type.toLowerCase()}
                   className='text-sm font-medium'
@@ -53,7 +109,12 @@ export function JobFilters() {
         <Separator />
         <div className='space-y-4'>
           <Label className='text-lg font-semibold'>Location</Label>
-          <Select>
+          <Select
+            value={currentLocation}
+            onValueChange={(location) => {
+              handleLocationChange(location);
+            }}
+          >
             <SelectTrigger>
               <SelectValue placeholder='Select Location' />
             </SelectTrigger>
