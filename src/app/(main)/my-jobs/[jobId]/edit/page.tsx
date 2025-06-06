@@ -1,0 +1,80 @@
+import { prisma } from '@/lib/prisma';
+import { requireUser } from '@/app/utils/requireUser';
+import { notFound } from 'next/navigation';
+import EditJobForm from '@/components/general/EditJobForm';
+
+async function getJobPost({
+  jobId,
+  userId,
+}: {
+  jobId: string;
+  userId: string;
+}) {
+  const jobPost = await prisma.jobPost.findUnique({
+    where: {
+      id: jobId,
+      Company: {
+        userId: userId,
+      },
+    },
+    select: {
+      benefits: true,
+      id: true,
+      jobTitle: true,
+      jobDescription: true,
+      salaryTo: true,
+      salaryFrom: true,
+      location: true,
+      employmentType: true,
+      listingDuration: true,
+      Company: {
+        select: {
+          about: true,
+          name: true,
+          location: true,
+          website: true,
+          xAccount: true,
+          logo: true,
+        },
+      },
+    },
+  });
+
+  if (!jobPost) {
+    return notFound();
+  }
+
+  return jobPost;
+}
+
+type Params = Promise<{ jobId: string }>;
+
+const EditJobPage = async ({ params }: { params: Params }) => {
+  const { jobId } = await params;
+  const user = await requireUser();
+  const jobPost = await getJobPost({ jobId, userId: user.id as string });
+
+  if (!jobPost) {
+    return notFound();
+  }
+
+  return (
+    <>
+      <EditJobForm
+        jobPost={{
+          ...jobPost,
+          Company: jobPost.Company ?? {
+            name: '',
+            location: '',
+            about: '',
+            logo: '',
+            website: '',
+            xAccount: null,
+          },
+        }}
+      />
+    </>
+  );
+};
+
+export default EditJobPage;
