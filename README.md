@@ -4,27 +4,61 @@ A modern, full‑featured job board built with Next.js 15, TailwindCSS, and Shad
 
 ---
 
-## Table of Contents
+## 📑 **Table of Contents**
+
+* ✨ **Features**
+
+* 🛠️ **Tech Stack**
+
+* 🚀 **Getting Started**
+
+  * 📋 **Prerequisites**
+  * 📥 **Installation**
+  * 🔑 **Environment Variables**
+  * 💻 **Running Locally**
+
+* 🎯 **Usage**
+
+* 🔄 **Workflow & Background Jobs**
+
+* 🔐 **Security**
+
+* 💳 **Payment Integration**
+
+* 📦 **Deployment**
+
+* 🤝 **Contributing**
+
+* 📄 **License**
 
 * [Features](#features)
+
 * [Tech Stack](#tech-stack)
+
 * [Getting Started](#getting-started)
 
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
   * [Environment Variables](#environment-variables)
   * [Running Locally](#running-locally)
+
 * [Usage](#usage)
+
 * [Workflow & Background Jobs](#workflow--background-jobs)
+
 * [Security](#security)
+
 * [Payment Integration](#payment-integration)
+
 * [Deployment](#deployment)
+
 * [Contributing](#contributing)
+
 * [License](#license)
 
 ---
 
-## Features
+## ✨ **Features**
 
 ### 🌐 Core Framework
 
@@ -82,7 +116,7 @@ A modern, full‑featured job board built with Next.js 15, TailwindCSS, and Shad
 
 ---
 
-## Tech Stack
+## 🛠️ **Tech Stack**
 
 * **Framework**: Next.js 15
 * **Styling**: TailwindCSS, Shadcn UI
@@ -97,7 +131,7 @@ A modern, full‑featured job board built with Next.js 15, TailwindCSS, and Shad
 
 ---
 
-## Getting Started
+## 🚀 **Getting Started**
 
 ### Prerequisites
 
@@ -169,7 +203,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Usage
+## 🎯 **Usage**
 
 * Sign up or log in via Google/GitHub.
 * Complete onboarding as an Organization or Job Seeker.
@@ -179,14 +213,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Workflow & Background Jobs
+## 🔄 **Workflow & Background Jobs**
 
 * Inngest runs a scheduled task every 48 hours for 30 days after account creation.
 * Sends an aggregated email of new job posts to subscribers.
 
 ---
 
-## Security
+## 🔐 **Security**
 
 Arcjet Security is configured out of the box to handle:
 
@@ -197,14 +231,14 @@ Arcjet Security is configured out of the box to handle:
 
 ---
 
-## Payment Integration
+## 💳 **Payment Integration**
 
 * Stripe Checkout for job post payments.
 * Webhooks listen for payment success and update job post status.
 
 ---
 
-## Deployment
+## 📦 **Deployment**
 
 1. Push your code to GitHub.
 2. Connect the repository to Vercel.
@@ -213,7 +247,7 @@ Arcjet Security is configured out of the box to handle:
 
 ---
 
-## Contributing
+## 🤝 **Contributing**
 
 1. Fork the repository.
 2. Create a feature branch: `git checkout -b feature/YourFeature`.
@@ -225,6 +259,6 @@ Please follow the existing code style and include tests for new features.
 
 ---
 
-## License
+## 📄 **License**
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
